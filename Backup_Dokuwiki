@@ -2,9 +2,6 @@
 # Turn on echo
 set -x 
 
-# Exit if rclone running
-# if [[ "$(pidof -x $(basename $0) -o %PPID)" ]]; then exit; fi
-
 echo "STARTED $(date +%Y.%m.%d_%H.%M)"
 . "/mnt/user/nas/Files/script/library/library_copy.sh"
 
@@ -12,18 +9,10 @@ echo "STARTED $(date +%Y.%m.%d_%H.%M)"
 ## Parameters
 ################################
 BACKUP_NAME="dokuwiki"
-tar_file="${DIR_BACKUP}/${BACKUP_NAME}/${BACKUP_NAME}_data_$(date +%Y.%m.%d_%H%M).tar.gz"
-source_dir="/mnt/user/appdata/"
+source_dir="${DIR_APPDATA}"
 tar_source="dokuwiki/dokuwiki/data"
-LOGNAME="$DIR_LOG/Log_$(date +%Y.%m.%d.%H%M)_Backup_${BACKUP_NAME}.log"
 KUMA_TOKEN="Igo1BJdDsW"
 
-#############################################
-## Backup files to tar file in Backup folder
-#############################################
-cd "${source_dir}"
-tar -cvzf "$tar_file" "$tar_source" 2>"$LOGNAME"  # Log copu
-kuma_notification "$KUMA_TOKEN" "$?" # Register outcome with Uptime Kuma
-purge_dir "$BACKUP_NAME"
+tar_copy "$BACKUP_NAME" "$source_dir" "$tar_source" "$KUMA_TOKEN"
 
 echo "COMPLETED $(date +%Y.%m.%d_%H.%M)"
