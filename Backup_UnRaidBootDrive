@@ -1,0 +1,30 @@
+#!/usr/bin/env sh
+# Turn on echo
+set -x 
+
+# Exit if rclone running
+# if [[ "$(pidof -x $(basename $0) -o %PPID)" ]]; then exit; fi
+
+echo "STARTED $(date +%Y.%m.%d_%H.%M)"
+. "/mnt/user/nas/Files/script/library/library_copy.sh"
+
+################################
+## Parameters
+################################
+BACKUP_NAME="boot"
+tar_dest="$DIR_BACKUP/$BACKUP_NAME"
+source_dir="/"
+tar_source="boot"
+LOGNAME="$DIR_LOG/Log_$(date +%Y.%m.%d.%H%M)_Backup_${BACKUP_NAME}.log"
+KUMA_TOKEN="BtsfaHxmR2"
+
+#############################################
+## Backup files to tar file in Backup folder
+#############################################
+cd "${source_dir}"
+[ -z ${tar_dest} ] && tar_dest=/mnt/disks/VMs/appdata/backupFlash
+tar -C ${tar_source} -zvcf ${tar_dest}/`hostname`-flash-`date +%Y.%m.%d.%H%M`.tgz --exclude config/super.dat --exclude 'previous*' --exclude 'bz*' --exclude "System Volume Information" .  2>"$LOGNAME"  # Log copy
+kuma_notification "$KUMA_TOKEN" "$?" # Register outcome with Uptime Kuma
+purge_dir "$BACKUP_NAME"
+
+echo "COMPLETED $(date +%Y.%m.%d_%H.%M)"
